@@ -101,8 +101,8 @@ celerybeat.pid
 # Environments
 .env
 .venv
-.env.example
 .env*
+!.env.example
 env/
 venv/
 ENV/
@@ -182,7 +182,6 @@ logs/
 .env.local
 .env.production
 .env.staging
-.env.example
 *.key
 secrets.json
 config.json

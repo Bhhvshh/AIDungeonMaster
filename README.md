@@ -1,88 +1,201 @@
 # AI Dungeon Master
 
-An interactive text-based RPG powered by AI, where GPT acts as your Dungeon Master!
+An interactive text-based RPG powered by Google Gemini AI, available as both a **CLI game** and a **full-stack web application**.
 
 ## 🎮 Features
 
-- **AI-Powered Storytelling**: Uses OpenAI GPT to create dynamic, engaging narratives
+- **AI-Powered Storytelling**: Uses Google Gemini to create dynamic, engaging narratives
 - **Choice-Based Gameplay**: Always presents 3 meaningful choices at every decision point
 - **Memory System**: Remembers your actions, stats, and story progression
-- **Character Stats**: Track HP, inventory, level, and experience
+- **Character Stats**: Track HP, gold, inventory, and level
 - **Save/Load System**: Continue your adventures across sessions
-- **Rich Terminal UI**: Beautiful colored text and formatted displays
-- **Demo Mode**: Works even without OpenAI API (with pre-scripted responses)
+- **Rich Terminal UI**: Beautiful colored text and formatted displays (CLI mode)
+- **Web App**: Full-stack React frontend + FastAPI backend
+- **Demo Mode**: Works even without a Gemini API key (with pre-scripted responses)
+
+## 🏗️ Architecture
+
+```
+AIDungeonMaster/
+├── main.py              # CLI game entry point
+├── dungeon_master.py    # CLI AI interaction and response generation
+├── memory.py            # CLI game state and history management
+├── config.py            # CLI configuration and settings
+├── requirements.txt     # CLI Python dependencies
+├── .env.example         # Environment variables template
+├── GEMINI_SETUP_GUIDE.md # Gemini API key setup guide
+│
+├── backend/             # FastAPI REST API backend
+│   ├── main.py          # API entry point and route handlers
+│   ├── ai_manager.py    # Gemini AI integration
+│   ├── game_engine.py   # Core game logic and session management
+│   ├── models.py        # Pydantic request/response models
+│   ├── config.py        # Backend configuration (pydantic-settings)
+│   ├── requirements.txt # Backend Python dependencies
+│   ├── quickstart.py    # Helper script to start the backend
+│   └── start.sh         # Shell script to start the backend
+│
+└── frontend/
+    └── dungeonmaster/   # React + Vite frontend
+        ├── src/         # React components and app logic
+        ├── index.html   # HTML entry point
+        └── vite.config.js
+```
 
 ## 🚀 Quick Start
 
 ### Prerequisites
 
 - Python 3.8 or higher
-- OpenAI API key (optional, for full AI functionality)
+- Node.js 18+ (for the web frontend)
+- Google Gemini API key (optional, for full AI functionality — see [GEMINI_SETUP_GUIDE.md](GEMINI_SETUP_GUIDE.md))
 
-### Installation
+### Environment Setup
 
-1. **Clone or download this project**
+Copy `.env.example` to `.env` and add your Gemini API key:
+
+```bash
+cp .env.example .env
+```
+
+Then edit `.env`:
+
+```
+GEMINI_API_KEY=your_gemini_api_key_here
+```
+
+---
+
+### Option 1: CLI Game
+
+1. **Install dependencies:**
+
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+2. **Run the game:**
+
+   ```bash
+   python main.py
+   ```
+
+---
+
+### Option 2: Web App (Backend + Frontend)
+
+#### Backend (FastAPI)
+
+1. **Navigate to the backend directory:**
+
+   ```bash
+   cd backend
+   ```
+
 2. **Install dependencies:**
 
    ```bash
    pip install -r requirements.txt
    ```
 
-3. **Set up OpenAI API (optional but recommended):**
+3. **Copy the environment file:**
 
-   - Get an API key from [OpenAI](https://platform.openai.com/api-keys)
-   - Copy `.env.example` to `.env`
-   - Add your API key to the `.env` file:
-     ```
-     OPENAI_API_KEY=your_actual_api_key_here
-     ```
-
-4. **Run the game:**
    ```bash
-   python main.py
+   cp ../.env.example .env
+   # Edit .env to add your GEMINI_API_KEY
    ```
 
-## 🎯 How to Play
+4. **Start the server:**
+
+   ```bash
+   python main.py
+   # or use the helper scripts:
+   # python quickstart.py
+   # bash start.sh
+   ```
+
+   The API will be available at `http://localhost:5000`.  
+   Interactive API docs: `http://localhost:5000/docs`
+
+#### Frontend (React + Vite)
+
+1. **Navigate to the frontend directory:**
+
+   ```bash
+   cd frontend/dungeonmaster
+   ```
+
+2. **Install dependencies:**
+
+   ```bash
+   npm install
+   ```
+
+3. **Start the development server:**
+
+   ```bash
+   npm run dev
+   ```
+
+   The app will be available at `http://localhost:5173`.
+
+---
+
+## 🎯 How to Play (CLI)
 
 1. **Start the Game**: Run `python main.py`
 2. **Enter Your Name**: Choose your adventurer's name
-3. **Read the Story**: The AI will describe your situation
+3. **Read the Story**: Gemini AI will describe your situation
 4. **Make Choices**: Type `1`, `2`, or `3` to select your action
 5. **Continue the Adventure**: The AI responds and gives you new choices
 
-### Game Commands
+### CLI Commands
 
-- `1`, `2`, `3` - Make story choices
-- `stats` - View your character stats
-- `save` - Save your current game
-- `load` - Load a previously saved game
-- `quit`/`exit` - End the game
+| Command       | Action                        |
+|---------------|-------------------------------|
+| `1`, `2`, `3` | Make a story choice           |
+| `stats`       | View your character stats     |
+| `save`        | Save your current game        |
+| `load`        | Load a previously saved game  |
+| `quit`/`exit` | End the game                  |
 
-## 📁 Project Structure
+---
 
-```
-DungeonMaster/
-├── main.py              # Game entry point and UI
-├── dungeon_master.py    # AI interaction and response generation
-├── memory.py            # Game state and history management
-├── config.py            # Configuration and settings
-├── requirements.txt     # Python dependencies
-├── .env.example        # Environment variables template
-└── README.md           # This file
-```
+## 🌐 API Endpoints
+
+| Method | Endpoint                  | Description                      |
+|--------|---------------------------|----------------------------------|
+| GET    | `/api/health`             | Health check                     |
+| GET    | `/api/status`             | Backend status and AI availability |
+| POST   | `/api/start-game`         | Start a new game session         |
+| POST   | `/api/make-choice`        | Process a player choice          |
+| POST   | `/api/save-game`          | Save the current game state      |
+| GET    | `/api/game/{session_id}`  | Get current game state           |
+| GET    | `/api/session/{session_id}` | Get session metadata           |
+
+---
 
 ## 🔧 Configuration
 
-### Game Settings (config.py)
+### Environment Variables (`.env`)
 
-- `OPENAI_MODEL`: AI model to use (default: "gpt-3.5-turbo")
-- `MAX_MEMORY_ENTRIES`: How many story entries to remember
+| Variable        | Default              | Description                                    |
+|-----------------|----------------------|------------------------------------------------|
+| `GEMINI_API_KEY` | *(empty)*           | Your Google Gemini API key                     |
+| `GEMINI_MODEL`  | `gemini-2.0-flash`   | Gemini model to use                            |
+| `DEBUG`         | `True`               | Enable debug mode (backend)                    |
+| `HOST`          | `0.0.0.0`            | Backend server host                            |
+| `PORT`          | `5000`               | Backend server port                            |
+| `CORS_ORIGINS`  | `http://localhost:5173,...` | Allowed CORS origins (comma-separated) |
+
+### CLI Game Settings (`config.py`)
+
+- `GEMINI_MODEL`: AI model to use (default: `gemini-1.5-flash`)
+- `MAX_MEMORY_ENTRIES`: How many story entries to keep in memory
 - `STARTING_HP`: Player's starting health points
 - `STARTING_INVENTORY`: Initial items in player's inventory
 
-### Environment Variables (.env)
-
-- `OPENAI_API_KEY`: Your OpenAI API key for full AI functionality
+---
 
 ## 🎲 Game Features Explained
 
@@ -90,67 +203,56 @@ DungeonMaster/
 
 - Creates immersive fantasy scenarios
 - Responds intelligently to player actions
-- Maintains story consistency
+- Maintains story consistency across turns
 - Always provides exactly 3 meaningful choices
 
 ### Memory System
 
 - Tracks complete story history
-- Remembers player stats (HP, inventory, level, XP)
-- Saves NPC interactions and completed quests
-- Provides context to AI for consistent storytelling
+- Remembers player stats (HP, gold, inventory, level)
+- Provides rolling context window to AI for consistent storytelling
 
 ### Player Progression
 
 - **Health Points**: Combat and hazard management
-- **Inventory**: Collect and use items throughout your journey
-- **Experience**: Gain XP from successful actions
-- **Location Tracking**: Remember where you've been
+- **Gold**: Collect treasure throughout your journey
+- **Inventory**: Collect and use items
+- **Level**: Character power progression
 
-## 🌐 Extending to Web App
-
-This project is designed to be easily extended to a web application:
-
-### Recommended Approach:
-
-1. **Backend**: Use Flask or FastAPI to expose the game logic as REST APIs
-2. **Frontend**: Create a web interface with HTML/CSS/JavaScript
-3. **Database**: Replace JSON save files with PostgreSQL/MongoDB
-4. **Real-time**: Add WebSocket support for live updates
-5. **Multi-player**: Extend memory system to support multiple users
-
-### Key Extension Points:
-
-- `GameInterface` class can be adapted for web responses
-- `GameMemory` can be modified to use database storage
-- `DungeonMaster` API calls can become web service endpoints
+---
 
 ## 🛠️ Development
 
-### Adding New Features
+### CLI Dependencies
 
-- **NPC System**: Extend `memory.py` to track NPC relationships
-- **Combat System**: Add combat mechanics in `dungeon_master.py`
-- **Magic System**: Implement spells and magical items
-- **Multiplayer**: Modify memory system for shared adventures
-
-### Dependencies
-
-- `openai>=1.3.0`: AI response generation
+- `google-generativeai>=0.3.0`: AI response generation
 - `rich>=13.0.0`: Beautiful terminal UI
 - `python-dotenv>=1.0.0`: Environment variable management
+
+### Backend Dependencies
+
+- `fastapi==0.104.1`: REST API framework
+- `uvicorn==0.24.0`: ASGI server
+- `pydantic==2.5.0` / `pydantic-settings==2.1.0`: Data validation and settings
+- `google-genai`: Google Gemini SDK
+- `python-dotenv==1.0.0`: Environment variable management
+
+---
 
 ## 🐛 Troubleshooting
 
 ### Common Issues
 
-1. **"OpenAI API key not found"**: Create a `.env` file with your API key
+1. **"Gemini API key not found"**: Create a `.env` file with your `GEMINI_API_KEY`. See [GEMINI_SETUP_GUIDE.md](GEMINI_SETUP_GUIDE.md) for instructions.
 2. **Import errors**: Make sure all dependencies are installed (`pip install -r requirements.txt`)
-3. **Save/load issues**: Check file permissions in the project directory
+3. **CORS errors in browser**: Ensure the frontend origin is listed in `CORS_ORIGINS` in your `.env`
+4. **Save/load issues**: Check file permissions in the project directory
 
 ### Demo Mode
 
-If you don't have an OpenAI API key, the game runs in demo mode with pre-scripted responses. This still provides a fun experience to test the game mechanics!
+If no Gemini API key is configured, the game runs in demo mode with pre-scripted responses. This still provides a playable experience to test the game mechanics!
+
+---
 
 ## 📄 License
 
@@ -160,11 +262,11 @@ This project is open source and available under the MIT License.
 
 Feel free to contribute by:
 
-- Adding new story scenarios
-- Improving the AI prompts
-- Adding new game mechanics
-- Creating a web interface
-- Fixing bugs or improving code
+- Adding new story scenarios or AI prompts
+- Improving game mechanics
+- Enhancing the React frontend
+- Adding multiplayer support
+- Fixing bugs or improving performance
 
 ## 🎉 Have Fun!
 
